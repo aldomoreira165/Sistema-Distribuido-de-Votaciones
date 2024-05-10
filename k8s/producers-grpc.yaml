@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producers-grpc
+  namespace: kafka
+spec:
+  selector:
+    matchLabels:
+      role: producers-grpc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: producers-grpc
+    spec:
+      containers:
+      - name: client
+        image: aldomoreirav/grpc-client:latest
+        ports:
+        - containerPort: 3000
+      - name: server
+        image: aldomoreirav/grpc-server:latest
+        ports:
+        - containerPort: 3001
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: producers-grpc-service
+  namespace: kafka
+spec:
+    type: ClusterIP
+    ports:
+    - name: client
+      port: 3000
+      targetPort: 3000
+    - name: server
+      port: 3001
+      targetPort: 3001
+    selector:
+      role: producers-grpc
+    

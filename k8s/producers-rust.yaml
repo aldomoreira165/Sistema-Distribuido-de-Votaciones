@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producers-rust
+  namespace: kafka
+spec:
+  selector:
+    matchLabels:
+      role: producers-rust
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: producers-rust
+
+    spec:
+      containers:
+      - name: rust-client
+        image: aldomoreirav/rust-client
+        ports:
+        - containerPort: 8000
+      - name: rust-server
+        image: aldomoreirav/rust-server
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: producers-rust-service
+  namespace: kafka
+spec:
+  type: ClusterIP
+  ports:
+  - name: rust-client-port
+    port: 8000
+    targetPort: 8000
+  - name: rust-server-port
+    port: 8080
+    targetPort: 8080
+  selector:
+    role: producers-rust

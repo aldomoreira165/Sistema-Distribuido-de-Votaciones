@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-deployment
+  namespace: kafka
+spec:
+  selector:
+    matchLabels:
+      role: consumer-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: consumer-deployment
+    spec:
+      containers:
+      - name: consumer
+        image: aldomoreirav/consumer:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+        ports:
+        - containerPort: 3003
+      restartPolicy: Always  
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: consumer-service
+  namespace: kafka
+spec:
+  ports:
+  - name: consumer
+    port: 3003
+    targetPort: 3003
+  selector:
+    role: consumer-deployment
+    
